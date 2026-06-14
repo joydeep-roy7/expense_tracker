@@ -1,3 +1,4 @@
+import 'package:expense_tracker/screen_views/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ class ExpenseTracker extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ,
+      home: BottomNavigationBarState(),
     );
   }
 }
