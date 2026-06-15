@@ -1,8 +1,9 @@
-import 'dart:math';
+import 'dart:developer';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:expense_tracker/screen_views/dashboard/dashboard_screen.dart';
 import 'package:expense_tracker/screen_views/statistics/statistics_screen.dart';
 import 'package:expense_tracker/screen_views/transaction/transaction_list_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarState extends StatefulWidget {
@@ -13,9 +14,9 @@ class BottomNavigationBarState extends StatefulWidget {
 }
 
 class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
-  final _pageController = PageController(initialPage: 0);
+  final _pageController = PageController(initialPage: 1);
   final NotchBottomBarController _controller = NotchBottomBarController(
-    index: 0,
+    index: 1,
   );
   int maxCount = 3;
 
@@ -29,9 +30,9 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
+      const TransactionListScreen(),
       DashboardScreen(controller: (_controller)),
       const StatisticsScreen(),
-      const TransactionListScreen(),
     ];
 
     return Scaffold(
@@ -52,7 +53,7 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
               maxLine: 1,
               shadowElevation: 5,
               kBottomRadius: 28.0,
-              notchColor: Colors.black87,
+              notchColor: Colors.white,
               removeMargins: false,
               bottomBarWidth: 500,
               showShadow: false,
@@ -63,27 +64,27 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
               elevation: 1,
               bottomBarItems: const [
                 BottomBarItem(
-                  inActiveItem: Icon(Icons.home_filled, color: Colors.blueGrey),
+                  inActiveItem: Icon(Symbols.history_edu, color: Colors.blueGrey, size: 30.0),
 
-                  activeItem: Icon(Icons.home_filled, color: Colors.blueAccent),
-                  itemLabel: 'Page 1',
+                  activeItem: Icon(Symbols.history_edu, color: Colors.green,),
+                  itemLabel: 'Transaction',
                 ),
 
                 BottomBarItem(
-                  inActiveItem: Icon(Icons.star, color: Colors.blueGrey),
-                  activeItem: Icon(Icons.star, color: Colors.blueAccent),
-                  itemLabel: 'Page 2',
+                  inActiveItem: Icon(Symbols.home_app_logo, color: Colors.blueGrey, size: 30.0),
+                  activeItem: Icon(Symbols.home_app_logo, color: Colors.green,),
+                  itemLabel: 'Home',
                 ),
 
                 BottomBarItem(
-                  inActiveItem: Icon(Icons.settings, color: Colors.blueGrey),
-                  activeItem: Icon(Icons.settings, color: Colors.pink),
-                  itemLabel: 'Page 3',
+                  inActiveItem: Icon(Symbols.finance_mode, color: Colors.blueGrey, size: 30.0),
+                  activeItem: Icon(Symbols.finance_mode, color: Colors.green,),
+                  itemLabel: 'Statistics',
                 ),
               ],
 
               onTap: (index) {
-                log("current selected index $index" as num);
+                log('current selected index $index');
                 _pageController.jumpToPage(index);
               },
               kIconSize: 24.0,
