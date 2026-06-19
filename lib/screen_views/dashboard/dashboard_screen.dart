@@ -1,6 +1,4 @@
-import 'package:expense_tracker/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../utils/app_constants.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -12,10 +10,13 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // final Color primaryGreen = const Color(0xff0B5D46);
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: const Color(0xffFFFFFF),
         drawer: appDrawer(),
         appBar: AppBar(
           backgroundColor: Color(0xFF6C63FF),
@@ -43,7 +44,144 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(width: 10.0),
           ],
         ),
-        // body: ,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                height: 260,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xFF6C63FF),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(35),
+                    bottomRight: Radius.circular(35),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "👋 Welcome back,",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Expense Tracker",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Transform.translate(
+                offset: const Offset(0, -100),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.account_balance_wallet),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Total Balance",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          const Text(
+                            "৳ 74000.00",
+                            style: TextStyle(
+                              fontSize: 42,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 30),
+
+                          const Divider(),
+
+                          const SizedBox(height: 20),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _incomeExpense(
+                                Icons.arrow_downward,
+                                Colors.green,
+                                "Income",
+                                "৳ 105000",
+                              ),
+                              _incomeExpense(
+                                Icons.arrow_upward,
+                                Colors.red,
+                                "Expenses",
+                                "৳ 31000",
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Recent Transactions",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "See all",
+                      style: TextStyle(
+                        color: const Color(0xFF6C63FF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -100,33 +238,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white,
-                          // backgroundImage: NetworkImage(
-                          //   ///
-                          // ),
-                        ),
-                        SizedBox(width: 10.0),
-                        Column(
-                          children: [
-                            Text(
-                              "Joysurjyo Roy",
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        CircleAvatar(radius: 40, backgroundColor: Colors.white),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Joysurjyo Roy",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            SizedBox(height: 5.0),
-                            Text(
-                              "Joysurjyodev@gmail.com",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.white,
+                              SizedBox(height: 5.0),
+                              Text(
+                                "Joysurjyodev@gmail.com",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -225,5 +362,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-
+  ///----------------- Top Header - Income,Expense -----------------------
+  static Widget _incomeExpense(
+    IconData icon,
+    Color color,
+    String title,
+    String amount,
+  ) {
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: color.withValues(alpha: 0.15),
+          child: Icon(icon, color: color),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title),
+            Text(
+              amount,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
