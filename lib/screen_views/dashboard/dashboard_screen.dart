@@ -1,9 +1,10 @@
+import 'package:animated_notch_bottom_bar/src/notch_bottom_bar_controller.dart';
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, required NotchBottomBarController controller});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
