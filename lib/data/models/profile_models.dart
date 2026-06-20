@@ -10,4 +10,5 @@ class ProfileModels {
     required this.name,
     this.gmail,
   });
+
 }

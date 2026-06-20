@@ -42,4 +42,5 @@ class TransactionModel {
     required this.date,
     this.note,
   });
+
 }
