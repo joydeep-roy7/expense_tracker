@@ -39,4 +39,5 @@ class TransactionController extends GetxController {
     return totalIncome - totalExpense;
   }
 
+
 }

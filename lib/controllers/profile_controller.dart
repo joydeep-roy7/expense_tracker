@@ -16,4 +16,5 @@ class ProfileController extends GetxController {
     update();
   }
 
+
 }
