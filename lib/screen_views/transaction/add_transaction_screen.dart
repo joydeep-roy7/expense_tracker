@@ -13,7 +13,7 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  final TransactionController controller = Get.put(TransactionController());
+  final TransactionController controller = Get.find<TransactionController>();
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -49,12 +49,22 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
+    final now = DateTime.now();
+
+    final transactionDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      now.hour,
+      now.minute,
+    );
+
     controller.addTransaction(
       TransactionModel(
         title: titleController.text.trim(),
         amount: double.parse(amountController.text.trim()),
         type: selectedType,
-        date: selectedDate,
+        date: transactionDate,
         note: noteController.text.trim(),
       ),
     );
@@ -84,6 +94,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xff5A2DDB),
         elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
         centerTitle: true,
         title: const Text(
           "Add Transaction",
@@ -235,7 +248,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           DateFormat('dd MMM, yyyy').format(selectedDate),
                         ),
                       ),
-                      const Icon(Icons.calendar_today),
+                      const Icon(Symbols.calendar_month),
                     ],
                   ),
                 ),
