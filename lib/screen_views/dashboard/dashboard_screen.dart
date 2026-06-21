@@ -4,7 +4,10 @@ import '../../utils/app_constants.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required NotchBottomBarController controller});
+  const DashboardScreen({
+    super.key,
+    required NotchBottomBarController controller,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -389,5 +392,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     );
+
   }
 }

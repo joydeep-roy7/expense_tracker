@@ -10,7 +10,8 @@ class BottomNavigationBarState extends StatefulWidget {
   const BottomNavigationBarState({super.key});
 
   @override
-  State<BottomNavigationBarState> createState() => _BottomNavigationBarStateState();
+  State<BottomNavigationBarState> createState() =>
+      _BottomNavigationBarStateState();
 }
 
 class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
@@ -64,21 +65,33 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
               elevation: 1,
               bottomBarItems: const [
                 BottomBarItem(
-                  inActiveItem: Icon(Symbols.history_edu, color: Colors.blueGrey, size: 30.0),
+                  inActiveItem: Icon(
+                    Symbols.history_edu,
+                    color: Colors.blueGrey,
+                    size: 30.0,
+                  ),
 
-                  activeItem: Icon(Symbols.history_edu, color: Colors.green,),
+                  activeItem: Icon(Symbols.history_edu, color: Colors.green),
                   itemLabel: 'Transaction',
                 ),
 
                 BottomBarItem(
-                  inActiveItem: Icon(Symbols.home_app_logo, color: Colors.blueGrey, size: 30.0),
-                  activeItem: Icon(Symbols.home_app_logo, color: Colors.green,),
+                  inActiveItem: Icon(
+                    Symbols.home_app_logo,
+                    color: Colors.blueGrey,
+                    size: 30.0,
+                  ),
+                  activeItem: Icon(Symbols.home_app_logo, color: Colors.green),
                   itemLabel: 'Home',
                 ),
 
                 BottomBarItem(
-                  inActiveItem: Icon(Symbols.finance_mode, color: Colors.blueGrey, size: 30.0),
-                  activeItem: Icon(Symbols.finance_mode, color: Colors.green,),
+                  inActiveItem: Icon(
+                    Symbols.finance_mode,
+                    color: Colors.blueGrey,
+                    size: 30.0,
+                  ),
+                  activeItem: Icon(Symbols.finance_mode, color: Colors.green),
                   itemLabel: 'Statistics',
                 ),
               ],
