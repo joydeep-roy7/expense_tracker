@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../controllers/transaction_controller.dart';
+import '../../utils/app_constants.dart';
 import 'add_transaction_screen.dart';
+import 'transaction_detail_screen.dart';
 
 class TransactionListScreen extends StatefulWidget {
   const TransactionListScreen({super.key});
@@ -13,8 +15,8 @@ class TransactionListScreen extends StatefulWidget {
 }
 
 class _TransactionListScreenState extends State<TransactionListScreen> {
-
-  final TransactionController controller = Get.find<TransactionController>();
+  final TransactionController controller =
+  Get.find<TransactionController>();
 
   String selectedFilter = "All";
   String searchText = "";
@@ -29,7 +31,7 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xff5A2DDB),
         title: const Text(
-          "All Transactions",
+          AppConstants.page1,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -94,10 +96,9 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
           if (searchText.isNotEmpty) {
             transactions = transactions
-                .where((e) =>
-                e.title
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()))
+                .where((e) => e.title
+                .toLowerCase()
+                .contains(searchText.toLowerCase()))
                 .toList();
           }
 
@@ -123,13 +124,12 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                 ),
               ),
 
-              /// FILTER + ADD (WRAP FIX)
+              /// FILTER + ADD
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  alignment: WrapAlignment.spaceBetween,
                   children: [
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -141,7 +141,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                         _filterButton("Expense"),
                       ],
                     ),
-
                     ElevatedButton.icon(
                       onPressed: () {
                         Get.to(() => const AddTransactionScreen());
@@ -176,21 +175,23 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                   itemBuilder: (context, index) {
                     final transaction = transactions[index];
 
-                    final currentDate = DateFormat("dd MMM yyyy")
+                    final currentDate =
+                    DateFormat("dd MMM yyyy")
                         .format(transaction.date);
 
+                    final prevDate = index > 0
+                        ? DateFormat("dd MMM yyyy")
+                        .format(transactions[index - 1].date)
+                        : "";
+
                     return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
                       children: [
-                        if (index == 0 ||
-                            DateFormat("dd MMM yyyy")
-                                .format(transactions[index].date) !=
-                                DateFormat("dd MMM yyyy")
-                                    .format(transactions[index - 1].date))
+                        if (index == 0 || currentDate != prevDate)
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                            ),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 12),
                             child: Text(
                               currentDate,
                               style: const TextStyle(
@@ -199,89 +200,108 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                             ),
                           ),
 
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 45,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  color: transaction.type.toLowerCase() ==
-                                      "income"
-                                      ? Colors.green.withValues(alpha: 0.15)
-                                      : Colors.red.withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
+                        /// ITEM CLICK (DETAIL PAGE)
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(() =>
+                                TransactionDetailScreen(
+                                  transaction: transaction,
+                                  index: index,
+                                ));
+                          },
+                          child: Container(
+                            margin:
+                            const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                              BorderRadius.circular(14),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 45,
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                    color: transaction.type
+                                        .toLowerCase() ==
+                                        "income"
+                                        ? Colors.green
+                                        .withValues(alpha: 0.15)
+                                        : Colors.red
+                                        .withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    transaction.type
+                                        .toLowerCase() ==
+                                        "income"
+                                        ? Icons.arrow_upward
+                                        : Icons.arrow_downward,
+                                    color: transaction.type
+                                        .toLowerCase() ==
+                                        "income"
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
                                 ),
-                                child: Icon(
-                                  transaction.type.toLowerCase() ==
-                                      "income"
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: transaction.type.toLowerCase() ==
-                                      "income"
-                                      ? Colors.green
-                                      : Colors.red,
+
+                                const SizedBox(width: 12),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        transaction.title,
+                                        style: const TextStyle(
+                                          fontWeight:
+                                          FontWeight.w600,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        transaction.type,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
 
-                              const SizedBox(width: 12),
-
-                              Expanded(
-                                child: Column(
+                                Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      transaction.title,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
+                                      "${transaction.type.toLowerCase() == "income" ? "+" : "-"} ৳${transaction.amount.toStringAsFixed(0)}",
+                                      style: TextStyle(
+                                        color: transaction.type
+                                            .toLowerCase() ==
+                                            "income"
+                                            ? Colors.green
+                                            : Colors.red,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      transaction.type,
+                                      DateFormat("hh:mm a")
+                                          .format(transaction.date),
                                       style: const TextStyle(
                                         color: Colors.grey,
-                                        fontSize: 12,
+                                        fontSize: 11,
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-
-                              Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    "${transaction.type.toLowerCase() == "income" ? "+" : "-"} ৳${transaction.amount.toStringAsFixed(0)}",
-                                    style: TextStyle(
-                                      color: transaction.type.toLowerCase() ==
-                                          "income"
-                                          ? Colors.green
-                                          : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    DateFormat("hh:mm a")
-                                        .format(transaction.date),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
