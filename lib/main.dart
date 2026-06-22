@@ -11,7 +11,9 @@ void main() async {
 
   Hive.registerAdapter(TransactionModelAdapter());
 
-  await Hive.openBox('transactions'); // DB BOX
+  if (!Hive.isBoxOpen('transactions')) {
+    await Hive.openBox<TransactionModel>('transactions');
+  } // DB BOX
 
   Get.put(TransactionController());
 

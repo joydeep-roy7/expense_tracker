@@ -5,7 +5,7 @@ class AppConstants {
   // Page name
   static const String page1 = "All Transaction";
   static const String page2 = "Dashboard";
-  static const String page3 = "Statistics";
+  static const String page3 = "Statistics View";
 
   // copyrights Save
   static const String copyrights = "Copyrights save by - Surjyo IT ©";

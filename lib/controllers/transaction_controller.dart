@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 class TransactionController extends GetxController {
-  late Box<TransactionModel> box;
+  late final Box<TransactionModel> box;
 
   @override
   void onInit() {
@@ -12,39 +12,40 @@ class TransactionController extends GetxController {
   }
 
   /// ADD
-  void addTransaction(TransactionModel transaction) {
-    box.add(transaction);
+  Future<void> addTransaction(TransactionModel transaction) async {
+    await box.add(transaction);
     update();
-
   }
 
   /// DELETE
-  void removeTransaction(dynamic key) {
-    box.delete(key);
+  Future<void> removeTransaction(dynamic key) async {
+    await box.delete(key);
     update();
   }
 
   /// UPDATE
-  void updateTransaction(
+  Future<void> updateTransaction(
       dynamic key,
       TransactionModel transaction,
-      ) {
-    box.put(key, transaction);
+      ) async {
+    await box.put(key, transaction);
     update();
   }
 
-  /// CALCULATIONS
+  /// TOTAL INCOME
   double get totalIncome {
     return box.values
-        .where((t) => t.type.toLowerCase() == "income")
-        .fold(0.0, (sum, item) => sum + item.amount);
+        .where((e) => e.type.toLowerCase() == "income")
+        .fold<double>(0, (sum, e) => sum + e.amount);
   }
 
+  /// TOTAL EXPENSE
   double get totalExpense {
     return box.values
-        .where((t) => t.type.toLowerCase() == "expense")
-        .fold(0.0, (sum, item) => sum + item.amount);
+        .where((e) => e.type.toLowerCase() == "expense")
+        .fold<double>(0, (sum, e) => sum + e.amount);
   }
 
+  /// BALANCE
   double get totalBalance => totalIncome - totalExpense;
 }

@@ -49,20 +49,30 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    final now = DateTime.now();
-
     final transactionDate = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
-      now.hour,
-      now.minute,
+      DateTime.now().hour,
+      DateTime.now().minute,
     );
+
+    final amount = double.tryParse(amountController.text.trim());
+
+    if (amount == null) {
+      Get.snackbar(
+        "Error",
+        "Enter valid amount",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
 
     controller.addTransaction(
       TransactionModel(
         title: titleController.text.trim(),
-        amount: double.parse(amountController.text.trim()),
+        amount: amount,
         type: selectedType,
         date: transactionDate,
         note: noteController.text.trim(),
@@ -94,15 +104,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xff5A2DDB),
         elevation: 0,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         title: const Text(
           "Add Transaction",
           style: TextStyle(color: Colors.white),
         ),
       ),
+
       body: Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(16),
@@ -187,11 +196,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               /// Icon
               CircleAvatar(
                 radius: 32,
-                backgroundColor: Colors.green.withValues(alpha: .15),
+                backgroundColor: selectedType == "Income"
+                    ? Colors.green.withValues(alpha: 0.15)
+                    : Colors.red.withValues(alpha: 0.15),
                 child: Icon(
                   selectedType == "Income"
-                      ? Symbols.wallet
-                      : Symbols.finance_mode,
+                      ? Symbols.trending_up
+                      : Symbols.trending_down,
                   color: selectedType == "Income" ? Colors.green : Colors.red,
                   size: 40,
                 ),
@@ -276,7 +287,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: saveTransaction,
+                  onPressed: (titleController.text.trim().isEmpty ||
+                      amountController.text.trim().isEmpty)
+                      ? null
+                      : saveTransaction,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff5A2DDB),
                     shape: RoundedRectangleBorder(

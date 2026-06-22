@@ -8,12 +8,12 @@ import 'edit_transaction_screen.dart';
 
 class TransactionDetailScreen extends StatelessWidget {
   final TransactionModel transaction;
-  final int index;
+  final dynamic keyValue;
 
   TransactionDetailScreen({
     super.key,
     required this.transaction,
-    required this.index, required keyValue,
+    required this.keyValue,
   });
 
   final TransactionController controller = Get.find<TransactionController>();
@@ -28,9 +28,7 @@ class TransactionDetailScreen extends StatelessWidget {
       ),
 
       middleText: "Are you sure you want to delete this transaction?",
-      middleTextStyle: const TextStyle(
-        color: Colors.black87,
-      ),
+      middleTextStyle: const TextStyle(color: Colors.black87),
 
       backgroundColor: Colors.white,
       radius: 12,
@@ -57,7 +55,7 @@ class TransactionDetailScreen extends StatelessWidget {
             /// DELETE BUTTON
             ElevatedButton(
               onPressed: () {
-                controller.removeTransaction(index);
+                controller.removeTransaction(keyValue);
 
                 Get.back();
                 Get.back();
@@ -239,9 +237,11 @@ class TransactionDetailScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Get.to(
-                          () => EditTransactionScreen(
-                            transaction: transaction,
-                            index: index,
+                          () => Get.to(
+                            () => EditTransactionScreen(
+                              transaction: transaction,
+                              keyValue: keyValue,
+                            ),
                           ),
                         );
                       },

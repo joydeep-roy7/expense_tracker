@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../controllers/transaction_controller.dart';
+import '../../data/models/transaction_model.dart';
 import '../../utils/app_constants.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -18,13 +19,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   late AnimationController _animController;
   late Animation<double> _animation;
 
+  int touchedIndex = -1;
+
   @override
   void initState() {
     super.initState();
 
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 1200),
     );
 
     _animation = CurvedAnimation(
@@ -41,15 +44,42 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     super.dispose();
   }
 
+  List<double> getMonthlyIncome(List<TransactionModel> data) {
+    List<double> monthly = List.filled(12, 0);
+
+    for (var t in data) {
+      if (t.type.toLowerCase() == "income") {
+        monthly[t.date.month - 1] += t.amount;
+      }
+    }
+    return monthly;
+  }
+
+  List<double> getMonthlyExpense(List<TransactionModel> data) {
+    List<double> monthly = List.filled(12, 0);
+
+    for (var t in data) {
+      if (t.type.toLowerCase() == "expense") {
+        monthly[t.date.month - 1] += t.amount;
+      }
+    }
+    return monthly;
+  }
+
+  final months = const [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FB),
 
       appBar: AppBar(
-        backgroundColor: const Color(0xff5A2DDB),
         elevation: 0,
         centerTitle: true,
+        backgroundColor: const Color(0xff5A2DDB),
         title: const Text(
           AppConstants.page3,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
@@ -58,30 +88,38 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
       body: GetBuilder<TransactionController>(
         builder: (_) {
-          double income = controller.totalIncome;
-          double expense = controller.totalExpense;
-          double total = income + expense;
 
-          double incomePercent = total == 0 ? 0 : (income / total);
-          double expensePercent = total == 0 ? 0 : (expense / total);
+          final data = controller.box.values.toList();
+
+          final income = controller.totalIncome;
+          final expense = controller.totalExpense;
+          final total = income + expense;
+
+          final incomePercent = total == 0 ? 0.0 : income / total;
+          final expensePercent = total == 0 ? 0.0 : expense / total;
+
+          final monthlyIncome = getMonthlyIncome(data);
+          final monthlyExpense = getMonthlyExpense(data);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                /// ================= PIE CHART (ANIMATED) =================
-                _glassCard(
+
+                /// ================= PIE CHART =================
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     children: [
-                      const Text(
-                        "Income vs Expense",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
 
-                      const SizedBox(height: 25),
+                      const Text("Income vs Expense",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+
+                      const SizedBox(height: 20),
 
                       SizedBox(
                         height: 240,
@@ -90,31 +128,42 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                           builder: (context, _) {
                             return PieChart(
                               PieChartData(
-                                startDegreeOffset: -90,
-                                centerSpaceRadius: 55,
-                                sectionsSpace: 3,
+                                centerSpaceRadius: 50,
+                                sectionsSpace: 4,
+                                pieTouchData: PieTouchData(
+                                  touchCallback: (event, response) {
+                                    setState(() {
+                                      if (!event.isInterestedForInteractions ||
+                                          response == null ||
+                                          response.touchedSection == null) {
+                                        touchedIndex = -1;
+                                        return;
+                                      }
+                                      touchedIndex =
+                                          response.touchedSection!
+                                              .touchedSectionIndex;
+                                    });
+                                  },
+                                ),
+
                                 sections: [
                                   PieChartSectionData(
                                     value: incomePercent * _animation.value,
                                     color: Colors.green,
-                                    radius: 70,
+                                    radius: touchedIndex == 0 ? 75 : 65,
                                     title:
-                                    "${(incomePercent * 100 * _animation.value).toStringAsFixed(1)}%",
+                                    "${(incomePercent * 100).toStringAsFixed(1)}%",
                                     titleStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        color: Colors.white),
                                   ),
                                   PieChartSectionData(
                                     value: expensePercent * _animation.value,
                                     color: Colors.red,
-                                    radius: 70,
+                                    radius: touchedIndex == 1 ? 75 : 65,
                                     title:
-                                    "${(expensePercent * 100 * _animation.value).toStringAsFixed(1)}%",
+                                    "${(expensePercent * 100).toStringAsFixed(1)}%",
                                     titleStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -122,16 +171,78 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                           },
                         ),
                       ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// ================= MONTHLY BAR CHART =================
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      const Text("Monthly Overview",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
 
                       const SizedBox(height: 20),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _legend(Colors.green, "Income"),
-                          const SizedBox(width: 20),
-                          _legend(Colors.red, "Expense"),
-                        ],
+                      SizedBox(
+                        height: 300,
+                        child: BarChart(
+                          BarChartData(
+                            barGroups: List.generate(12, (i) {
+                              return BarChartGroupData(
+                                x: i,
+                                barsSpace: 4,
+                                barRods: [
+                                  BarChartRodData(
+                                    toY: monthlyIncome[i],
+                                    color: Colors.green,
+                                    width: 5,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  BarChartRodData(
+                                    toY: monthlyExpense[i],
+                                    color: Colors.red,
+                                    width: 5,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ],
+                              );
+                            }),
+                            titlesData: FlTitlesData(
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      months[value.toInt()],
+                                      style: const TextStyle(fontSize: 10),
+                                    );
+                                  },
+                                ),
+                              ),
+                              leftTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              topTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                            ),
+                            gridData: const FlGridData(show: false),
+                            borderData: FlBorderData(show: false),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -139,69 +250,31 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
                 const SizedBox(height: 20),
 
-                /// ================= MONTHLY ANALYTICS =================
-                // _glassCard(
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       const Text(
-                //         "Monthly Analytics",
-                //         style: TextStyle(
-                //           fontSize: 18,
-                //           fontWeight: FontWeight.bold,
-                //         ),
-                //       ),
-                //
-                //       const SizedBox(height: 20),
-                //
-                //       _buildBar("Jan", 0.6),
-                //       _buildBar("Feb", 0.4),
-                //       _buildBar("Mar", 0.8),
-                //       _buildBar("Apr", 0.3),
-                //       _buildBar("May", 0.7),
-                //     ],
-                //   ),
-                // ),
-
-                const SizedBox(height: 20),
-
-                /// ================= SUMMARY =================
+                /// ================= SUMMARY (FIXED NO OVERFLOW) =================
                 Row(
                   children: [
-                    Expanded(
-                      child: _miniCard(
-                        "Income",
-                        income,
-                        Colors.green,
-                        Icons.arrow_downward,
-                      ),
-                    ),
+                    Expanded(child: _mini("Income", income, Colors.green)),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: _miniCard(
-                        "Expense",
-                        expense,
-                        Colors.red,
-                        Icons.arrow_upward,
-                      ),
-                    ),
+                    Expanded(child: _mini("Expense", expense, Colors.red)),
                   ],
                 ),
 
                 const SizedBox(height: 20),
 
                 /// ================= SAVINGS =================
-                _glassCard(
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Savings",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+
+                      const Text("Savings Progress",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+
                       const SizedBox(height: 10),
 
                       LinearProgressIndicator(
@@ -215,12 +288,10 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
                       Text(
                         "Saved ${(income - expense).toStringAsFixed(0)} ৳ this month",
-                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 70),
               ],
             ),
@@ -230,109 +301,27 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  /// ================= BAR (MONTHLY ANALYTICS) =================
-  // Widget _buildBar(String month, double value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 6),
-  //     child: Row(
-  //       children: [
-  //         SizedBox(width: 40, child: Text(month)),
-  //         Expanded(
-  //           child: ClipRRect(
-  //             borderRadius: BorderRadius.circular(10),
-  //             child: TweenAnimationBuilder<double>(
-  //               tween: Tween(begin: 0, end: value),
-  //               duration: const Duration(milliseconds: 800),
-  //               builder: (context, val, _) {
-  //                 return LinearProgressIndicator(
-  //                   value: val,
-  //                   minHeight: 10,
-  //                   backgroundColor: Colors.grey.shade200,
-  //                   color: Colors.deepPurple,
-  //                 );
-  //               },
-  //             ),
-  //           ),
-  //         ),
-  //         const SizedBox(width: 10),
-  //         Text("${(value * 100).toInt()}%"),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  /// ================= CARD =================
-  Widget _glassCard({required Widget child}) {
+  Widget _mini(String title, double value, Color color) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  /// ================= MINI CARD =================
-  Widget _miniCard(
-      String title,
-      double value,
-      Color color,
-      IconData icon,
-      ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            backgroundColor: color.withValues(alpha: 0.15),
-            child: Icon(icon, color: color),
-          ),
-          const SizedBox(height: 10),
           Text(title),
           const SizedBox(height: 5),
           Text(
             "৳ ${value.toStringAsFixed(0)}",
-            style: const TextStyle(
+            style: TextStyle(
+              color: color,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _legend(Color color, String title) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(title),
-      ],
     );
   }
 }

@@ -5,12 +5,12 @@ import '../../data/models/transaction_model.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   final TransactionModel transaction;
-  final int index;
+  final dynamic keyValue;
 
   const EditTransactionScreen({
     super.key,
     required this.transaction,
-    required this.index,
+    required this.keyValue,
   });
 
   @override
@@ -63,7 +63,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
       note: noteController.text.trim(),
     );
 
-    controller.updateTransaction(widget.index, updated);
+    controller.updateTransaction(widget.keyValue, updated);
 
     Get.back();
     Get.snackbar(

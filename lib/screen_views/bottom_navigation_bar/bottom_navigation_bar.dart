@@ -21,6 +21,7 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
   );
   int maxCount = 3;
 
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -32,7 +33,9 @@ class _BottomNavigationBarStateState extends State<BottomNavigationBarState> {
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       const TransactionListScreen(),
-      DashboardScreen(controller: (_controller)),
+      DashboardScreen(
+        notchController: _controller,
+      ),
       const StatisticsScreen(),
     ];
 
