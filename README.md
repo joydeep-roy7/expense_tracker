@@ -8,6 +8,15 @@ Your Personal Expense Tracker.
   <img src="./assets/icons/expense_tracker_logo.png" width="432" style="border-radius:20px;"  alt="App Icon"/>
 </p>
 
+
+## 📥 Download APK
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1ZxEbWFnYpoWCiPIogwBAiQv7c77UUQT-/view?usp=sharing">
+    <img src="https://img.shields.io/badge/Download-APK-blue?style=for-the-badge"  alt="Download"/>
+  </a>
+</p>
+
 # Personal Expense Tracker
 
 Flutter + GetX + Hive Local Database
