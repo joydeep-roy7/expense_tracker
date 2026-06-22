@@ -13,7 +13,7 @@ class TransactionDetailScreen extends StatelessWidget {
   TransactionDetailScreen({
     super.key,
     required this.transaction,
-    required this.index,
+    required this.index, required keyValue,
   });
 
   final TransactionController controller = Get.find<TransactionController>();

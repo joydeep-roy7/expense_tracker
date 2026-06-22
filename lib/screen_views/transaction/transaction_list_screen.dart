@@ -1,5 +1,7 @@
+import 'package:expense_tracker/data/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import '../../controllers/transaction_controller.dart';
 import '../../utils/app_constants.dart';
@@ -79,7 +81,10 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
       body: GetBuilder<TransactionController>(
         builder: (_) {
-          var transactions = controller.transactionData;
+          var transactions = controller.box.values;
+
+          List<TransactionModel> transactions =
+          controller.box.values.toList();
 
           if (selectedFilter != "All") {
             transactions = transactions
@@ -159,150 +164,156 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
               Expanded(
                 child: transactions.isEmpty
                     ? const Center(child: Text("No Transactions Found"))
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          bottom: 20,
-                        ),
-                        itemCount: transactions.length,
-                        itemBuilder: (context, index) {
-                          final transaction = transactions[index];
+                    : ValueListenableBuilder<Box>(
+                      valueListenable: controller.box.listenable(),
+                      builder: (context, value, child) {
+                        return ListView.builder(
+                            padding: const EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                              bottom: 20,
+                            ),
+                          itemCount: transactions.length,
+                            itemBuilder: (context, index) {
 
-                          final currentDate = DateFormat(
-                            "dd MMM yyyy",
-                          ).format(transaction.date);
+                              final transaction = transactions[index];
 
-                          final prevDate = index > 0
-                              ? DateFormat(
-                                  "dd MMM yyyy",
-                                ).format(transactions[index - 1].date)
-                              : "";
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (index == 0 || currentDate != prevDate)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: Text(
-                                    currentDate,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-
-                              GestureDetector(
-                                onTap: () {
-                                  Get.to(
-                                    () => TransactionDetailScreen(
-                                      transaction: transaction,
-                                      index: index,
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 45,
-                                        height: 45,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              transaction.type.toLowerCase() ==
-                                                  "income"
-                                              ? Colors.green.withValues(
-                                                  alpha: 0.15,
-                                                )
-                                              : Colors.red.withValues(
-                                                  alpha: 0.15,
-                                                ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          transaction.type.toLowerCase() ==
-                                                  "income"
-                                              ? Icons.arrow_upward
-                                              : Icons.arrow_downward,
-                                          color:
-                                              transaction.type.toLowerCase() ==
-                                                  "income"
-                                              ? Colors.green
-                                              : Colors.red,
+                              final currentDate = DateFormat(
+                                "dd MMM yyyy",
+                              ).format(transaction.date);
+                        
+                              final prevDate = index > 0
+                                  ? DateFormat(
+                                      "dd MMM yyyy",
+                                    ).format(transactions[index - 1].date)
+                                  : "";
+                        
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (index == 0 || currentDate != prevDate)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      child: Text(
+                                        currentDate,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-
-                                      const SizedBox(width: 12),
-
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              transaction.title,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              transaction.type,
-                                              style: const TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                    ),
+                        
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(
+                                            () => TransactionDetailScreen(
+                                              transaction: transaction,
+                                              keyValue: transaction.key,
+                                            )
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
-
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                      child: Row(
                                         children: [
-                                          Text(
-                                            "${transaction.type.toLowerCase() == "income" ? "+" : "-"} ৳${transaction.amount.toStringAsFixed(0)}",
-                                            style: TextStyle(
+                                          Container(
+                                            width: 45,
+                                            height: 45,
+                                            decoration: BoxDecoration(
                                               color:
-                                                  transaction.type
-                                                          .toLowerCase() ==
+                                                  transaction.type.toLowerCase() ==
+                                                      "income"
+                                                  ? Colors.green.withValues(
+                                                      alpha: 0.15,
+                                                    )
+                                                  : Colors.red.withValues(
+                                                      alpha: 0.15,
+                                                    ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              transaction.type.toLowerCase() ==
+                                                      "income"
+                                                  ? Icons.arrow_upward
+                                                  : Icons.arrow_downward,
+                                              color:
+                                                  transaction.type.toLowerCase() ==
                                                       "income"
                                                   ? Colors.green
                                                   : Colors.red,
-                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            DateFormat(
-                                              "hh:mm a",
-                                            ).format(transaction.date),
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 11,
+                        
+                                          const SizedBox(width: 12),
+                        
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  transaction.title,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  transaction.type,
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
+                                          ),
+                        
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "${transaction.type.toLowerCase() == "income" ? "+" : "-"} ৳${transaction.amount.toStringAsFixed(0)}",
+                                                style: TextStyle(
+                                                  color:
+                                                      transaction.type
+                                                              .toLowerCase() ==
+                                                          "income"
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                DateFormat(
+                                                  "hh:mm a",
+                                                ).format(transaction.date),
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
+                                ],
+                              );
+                            },
                           );
-                        },
-                      ),
+                      }
+                    ),
               ),
             ],
           );
