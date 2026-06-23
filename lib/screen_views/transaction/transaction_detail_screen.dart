@@ -237,11 +237,9 @@ class TransactionDetailScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Get.to(
-                          () => Get.to(
-                            () => EditTransactionScreen(
-                              transaction: transaction,
-                              keyValue: keyValue,
-                            ),
+                          () => EditTransactionScreen(
+                            transaction: transaction,
+                            keyValue: keyValue,
                           ),
                         );
                       },

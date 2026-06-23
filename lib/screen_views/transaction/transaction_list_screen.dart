@@ -201,11 +201,9 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                               GestureDetector(
                                 onTap: () {
                                   Get.to(
-                                    () => Get.to(
-                                      () => TransactionDetailScreen(
-                                        transaction: transaction,
-                                        keyValue: transaction.key,
-                                      ),
+                                    () => TransactionDetailScreen(
+                                      transaction: transaction,
+                                      keyValue: transaction.key,
                                     ),
                                   );
                                 },
